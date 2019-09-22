@@ -90,7 +90,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define PLAYER_INVENTORY_SIZE (8 * 4)
 
 // Default maximum hit points of a player
-#define PLAYER_MAX_HP_DEFAULT 20
+#define PLAYER_MAX_HP_DEFAULT 200
 
 // Default maximal breath of a player
 #define PLAYER_MAX_BREATH_DEFAULT 11
