@@ -222,10 +222,8 @@ void ClientEnvironment::step(float dtime)
 			const ContentFeatures &f = m_client->ndef()->
 				get(m_map->getNodeNoEx(info.node_p));
 			// Determine fall damage multiplier
-			int pre_addp = itemgroup_get(f.groups, "fall_damage_add_percent");
-			int post_addp = itemgroup_get(f.groups, "fall_damage_add_percent_post");
-                        pre_factor = 1.0f + (float)pre_addp / 100.0f;
-			post_factor = 1.0f + (float)post_addp / 100.0f;
+			int addp = itemgroup_get(f.groups, "fall_damage_add_percent");
+			pre_factor = 1.0f + (float)addp / 100.0f;
 		}
 		float speed = pre_factor * speed_diff.getLength();
 		if (speed > tolerance && !player_immortal) {
