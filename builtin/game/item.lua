@@ -251,8 +251,8 @@ local function user_name(user)
 	return user and user:get_player_name() or ""
 end
 
-local function is_protected(pos, name)
-	return core.is_protected(pos, name) and
+local function is_protected(pos, name, action)
+	return core.is_protected(pos, name, action) and
 		not minetest.check_player_privs(name, "protection_bypass")
 end
 
@@ -260,6 +260,8 @@ end
 local function make_log(name)
 	return name ~= "" and core.log or function() end
 end
+
+core.PLACE_ACTION = "place"
 
 function core.item_place_node(itemstack, placer, pointed_thing, param2,
 		prevent_after_place)
@@ -302,7 +304,7 @@ function core.item_place_node(itemstack, placer, pointed_thing, param2,
 		place_to = {x = under.x, y = under.y, z = under.z}
 	end
 
-	if is_protected(place_to, playername) then
+	if is_protected(place_to, playername, core.PLACE_ACTION) then
 		log("action", playername
 				.. " tried to place " .. def.name
 				.. " at protected position "
@@ -540,6 +542,8 @@ function core.handle_node_drops(pos, drops, digger)
 	end
 end
 
+core.DIG_ACTION = "dig"
+
 function core.node_dig(pos, node, digger)
 	local diggername = user_name(digger)
 	local log = make_log(diggername)
@@ -552,7 +556,7 @@ function core.node_dig(pos, node, digger)
 		return
 	end
 
-	if is_protected(pos, diggername) then
+	if is_protected(pos, diggername, core.DIG_ACTION) then
 		log("action", diggername
 				.. " tried to dig " .. node.name
 				.. " at protected position "

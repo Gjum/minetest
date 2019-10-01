@@ -169,7 +169,7 @@ end
 
 -- To be overriden by protection mods
 
-function core.is_protected(pos, name)
+function core.is_protected(pos, name, action)
 	return false
 end
 
