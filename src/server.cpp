@@ -2748,7 +2748,7 @@ void Server::acceptAuth(session_t peer_id, bool forSudoMode)
 		u32 sudo_auth_mechs = client->allowed_auth_mechs;
 		client->allowed_sudo_mechs = sudo_auth_mechs;
 
-		resp_pkt << v3f(0,0,0) << (u64) m_env->getServerMap().getSeed()
+		resp_pkt << v3f(0,0,0) << (u64) 0 // m_env->getServerMap().getSeed()
 				<< g_settings->getFloat("dedicated_server_step")
 				<< sudo_auth_mechs;
 
