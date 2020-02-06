@@ -208,6 +208,8 @@ DigParams getDigParams(const ItemGroupList &groups,
 		const ToolGroupCap &cap = groupcap.second;
 
 		int leveldiff = cap.maxlevel - level;
+		if (leveldiff > 0)
+			leveldiff = 0;
 		if (leveldiff < 0)
 			continue;
 
