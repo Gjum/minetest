@@ -588,6 +588,21 @@ function core.node_dig(pos, node, digger)
 		digger:set_wielded_item(wielded)
 	end
 
+        -- Don't drop anything if the node level exceeds the tool
+        local max_drop_level = 0
+        if wielded then
+           local tp = wielded:get_tool_capabilities()
+           if tp then
+              max_drop_level = tp.max_drop_level
+           end
+        end
+        if def.groups then
+           local node_level = def.groups.level or 0
+           if node_level > max_drop_level then
+              drops = {}
+           end
+        end
+
 	-- Check to see if metadata should be preserved.
 	if def and def.preserve_metadata then
 		local oldmeta = core.get_meta(pos):to_table().fields
