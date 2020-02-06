@@ -588,17 +588,36 @@ function core.node_dig(pos, node, digger)
 		digger:set_wielded_item(wielded)
 	end
 
-        -- Don't drop anything if the node level exceeds the tool
+        -- Don't drop anything if the node level exceeds the tool, ensuring that
+        -- the tool also has an appropriate group.
         local max_drop_level = 0
+        local tool_groups = {}
+        local group_match = false
         if wielded then
+           -- Conjure a list of tool groups and the tool max_drop_level
            local tp = wielded:get_tool_capabilities()
            if tp then
               max_drop_level = tp.max_drop_level
+              for name,_ in pairs(tp.groupcaps) do
+                 table.insert(tool_groups, name)
+              end
            end
         end
-        if def.groups then
-           local node_level = def.groups.level or 0
-           if node_level > max_drop_level then
+        if def and def.groups then
+           -- Find a group match
+           for _, name in ipairs(tool_groups) do
+              if def.groups[name] then
+                 group_match = true
+                 break
+              end
+           end
+           -- Group has to match and tool must have high-enough level, else no drops
+           if group_match then
+              local node_level = def.groups.level or 0
+              if node_level > max_drop_level then
+                 drops = {}
+              end
+           else
               drops = {}
            end
         end
