@@ -541,6 +541,27 @@ function core.handle_node_drops(pos, drops, digger)
 	end
 end
 
+local old_get_dig_params = core.get_dig_params
+core.get_dig_params = function(groups, toolcap)
+   local res = old_get_dig_params(groups, toolcap)
+   if res.wear > 0 then
+      -- reverse some portion of what getDigParams determines to be tool wear
+      local wear_as_float = math.min(res.wear, 65535) / 65535
+      local used_leveldiff = 0
+      local level = groups.level
+      for _,cap in pairs(toolcap.groupcaps) do
+         local leveldiff = cap.maxlevel - level
+         if leveldiff < 0 then
+            goto continue
+         end
+         used_leveldiff = leveldiff
+         ::continue::
+      end
+      res.wear = math.ceil(65535 * wear_as_float * math.pow(3.0, used_leveldiff))
+   end
+   return res
+end
+
 core.DIG_ACTION = "dig"
 
 function core.node_dig(pos, node, digger)
