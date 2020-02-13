@@ -548,7 +548,7 @@ core.get_dig_params = function(groups, toolcap)
       -- reverse some portion of what getDigParams determines to be tool wear
       local wear_as_float = math.min(res.wear, 65535) / 65535
       local used_leveldiff = 0
-      local level = groups.level
+      local level = groups.level or 0
       for _,cap in pairs(toolcap.groupcaps) do
          local leveldiff = cap.maxlevel - level
          if leveldiff < 0 then
