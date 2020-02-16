@@ -334,6 +334,89 @@ void IMoveAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 		}
 	}
 
+	// reverse_ma is only usable when would_swap == true
+	bool would_swap = false;
+	IMoveAction reverse_ma;
+
+	if (count != 0) {
+		ItemStack item1 = list_from->getItem(from_i);
+		if (!item1.empty()) {
+			ItemStack leftover;
+			list_to->itemFits(to_i, item1, &leftover);
+
+			if (!leftover.empty()
+					&& leftover.name == item1.name
+					&& leftover.count == item1.count
+					&& !caused_by_move_somewhere) {
+
+				reverse_ma.from_inv = to_inv;
+				reverse_ma.from_list = to_list;
+				reverse_ma.from_i = to_i;
+
+				reverse_ma.to_inv = from_inv;
+				reverse_ma.to_list = from_list;
+				reverse_ma.to_i = from_i;
+
+				would_swap = true;
+			}
+		}
+	}
+
+	if (would_swap) {
+		// If a swap will be performed, call allow callbacks for the reverse-side
+		// of the inventory swap.
+
+		ItemStack dst_item = list_to->getItem(to_i);
+
+		if (from_inv.type == InventoryLocation::DETACHED && from_inv == to_inv) {
+			s32 src_can_take_count2 = PLAYER_TO_SA(player)->detached_inventory_AllowMove(
+					reverse_ma, try_take_count, player);
+			src_can_take_count = std::min(src_can_take_count, src_can_take_count2);
+		} else if (from_inv.type == InventoryLocation::NODEMETA && from_inv == to_inv) {
+			s32 src_can_take_count2 = PLAYER_TO_SA(player)->nodemeta_inventory_AllowMove(
+					reverse_ma, try_take_count, player);
+			src_can_take_count = std::min(src_can_take_count, src_can_take_count2);
+		} else if (from_inv.type == InventoryLocation::PLAYER && from_inv == to_inv) {
+			s32 src_can_take_count2 = PLAYER_TO_SA(player)->player_inventory_AllowMove(
+					reverse_ma, try_take_count, player);
+			src_can_take_count = std::min(src_can_take_count, src_can_take_count2);
+		} else {
+			if (from_inv.type == InventoryLocation::DETACHED) {
+				s32 src_can_take_count2 = PLAYER_TO_SA(player)->detached_inventory_AllowPut(
+						reverse_ma, dst_item, player);
+				src_can_take_count = std::min(src_can_take_count, src_can_take_count2);
+			}
+			if (to_inv.type == InventoryLocation::DETACHED) {
+				s32 src_can_take_count2 = PLAYER_TO_SA(player)->detached_inventory_AllowTake(
+						reverse_ma, dst_item, player);
+				src_can_take_count = std::min(src_can_take_count, src_can_take_count2);
+			}
+
+			if (from_inv.type == InventoryLocation::NODEMETA) {
+				s32 src_can_take_count2 = PLAYER_TO_SA(player)->nodemeta_inventory_AllowPut(
+						reverse_ma, dst_item, player);
+				src_can_take_count = std::min(src_can_take_count, src_can_take_count2);
+			}
+			if (to_inv.type == InventoryLocation::NODEMETA) {
+				s32 src_can_take_count2 = PLAYER_TO_SA(player)->nodemeta_inventory_AllowTake(
+						reverse_ma, dst_item, player);
+				src_can_take_count = std::min(src_can_take_count, src_can_take_count2);
+			}
+
+			if (from_inv.type == InventoryLocation::PLAYER) {
+				s32 src_can_take_count2 = PLAYER_TO_SA(player)->player_inventory_AllowPut(
+						reverse_ma, dst_item, player);
+				src_can_take_count = std::min(src_can_take_count, src_can_take_count2);
+			}
+			if (to_inv.type == InventoryLocation::PLAYER) {
+				s32 src_can_take_count2 = PLAYER_TO_SA(player)->player_inventory_AllowTake(
+						reverse_ma, dst_item, player);
+				src_can_take_count = std::min(src_can_take_count, src_can_take_count2);
+			}
+		}
+		dst_can_put_count = src_can_take_count;
+	}
+
 	int old_count = count;
 
 	/* Modify count according to collected data */
@@ -381,6 +464,8 @@ void IMoveAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 	bool did_swap = false;
 	move_count = list_from->moveItem(from_i,
 		list_to, to_i, count, !caused_by_move_somewhere, &did_swap);
+
+	assert(would_swap == did_swap);
 
 	// If source is infinite, reset it's stack
 	if (src_can_take_count == -1) {
@@ -478,16 +563,31 @@ void IMoveAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 			from_inv == to_inv) {
 		PLAYER_TO_SA(player)->detached_inventory_OnMove(
 				*this, count, player);
+
+		if (did_swap) {
+			PLAYER_TO_SA(player)->detached_inventory_OnMove(
+				reverse_ma, count, player);
+		}
 	} else {
 		// Destination is detached
 		if (to_inv.type == InventoryLocation::DETACHED) {
 			PLAYER_TO_SA(player)->detached_inventory_OnPut(
 				*this, src_item, player);
+
+			if (did_swap) {
+				PLAYER_TO_SA(player)->detached_inventory_OnTake(
+					reverse_ma, to_stack_was, player);
+			}
 		}
 		// Source is detached
 		if (from_inv.type == InventoryLocation::DETACHED) {
 			PLAYER_TO_SA(player)->detached_inventory_OnTake(
 				*this, src_item, player);
+
+			if (did_swap) {
+				PLAYER_TO_SA(player)->nodemeta_inventory_OnPut(
+					reverse_ma, to_stack_was, player);
+			}
 		}
 	}
 
@@ -498,16 +598,31 @@ void IMoveAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 			from_inv == to_inv) {
 		PLAYER_TO_SA(player)->nodemeta_inventory_OnMove(
 			*this, count, player);
+
+		if (did_swap) {
+			PLAYER_TO_SA(player)->nodemeta_inventory_OnMove(
+				reverse_ma, count, player);
+		}
 	} else {
 		// Destination is nodemeta
 		if (to_inv.type == InventoryLocation::NODEMETA) {
 			PLAYER_TO_SA(player)->nodemeta_inventory_OnPut(
 				*this, src_item, player);
+
+			if (did_swap) {
+				PLAYER_TO_SA(player)->nodemeta_inventory_OnTake(
+					reverse_ma, to_stack_was, player);
+			}
 		}
 		// Source is nodemeta
 		if (from_inv.type == InventoryLocation::NODEMETA) {
 			PLAYER_TO_SA(player)->nodemeta_inventory_OnTake(
 				*this, src_item, player);
+
+			if (did_swap) {
+				PLAYER_TO_SA(player)->nodemeta_inventory_OnPut(
+					reverse_ma, to_stack_was, player);
+			}
 		}
 	}
 
@@ -518,16 +633,31 @@ void IMoveAction::apply(InventoryManager *mgr, ServerActiveObject *player, IGame
 			from_inv == to_inv) {
 		PLAYER_TO_SA(player)->player_inventory_OnMove(
 			*this, count, player);
+
+		if (did_swap) {
+			PLAYER_TO_SA(player)->player_inventory_OnMove(
+				reverse_ma, count, player);
+		}
 	} else {
 		// Destination is player inventory
 		if (to_inv.type == InventoryLocation::PLAYER) {
 			PLAYER_TO_SA(player)->player_inventory_OnPut(
 				*this, src_item, player);
+
+			if (did_swap) {
+				PLAYER_TO_SA(player)->player_inventory_OnTake(
+					reverse_ma, to_stack_was, player);
+			}
 		}
 		// Source is player inventory
 		if (from_inv.type == InventoryLocation::PLAYER) {
 			PLAYER_TO_SA(player)->player_inventory_OnTake(
 				*this, src_item, player);
+
+			if (did_swap) {
+				PLAYER_TO_SA(player)->player_inventory_OnPut(
+					reverse_ma, to_stack_was, player);
+			}
 		}
 	}
 
@@ -928,4 +1058,3 @@ bool getCraftingResult(Inventory *inv, ItemStack &result,
 
 	return found;
 }
-
