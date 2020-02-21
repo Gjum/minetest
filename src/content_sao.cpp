@@ -1316,7 +1316,7 @@ u16 PlayerSAO::punch(v3f dir,
 		}
 	}
 
-	actionstream << puncher->getDescription() << " (id=" << puncher->getId() <<
+	verbosestream << puncher->getDescription() << " (id=" << puncher->getId() <<
 		", hp=" << puncher->getHP() << ") punched " <<
 		getDescription() << " (id=" << m_id << ", hp=" << m_hp <<
 		"), damage=" << (old_hp - (s32)getHP()) <<
