@@ -815,7 +815,7 @@ void Server::handleCommand_Damage(NetworkPacket* pkt)
 			return;
 		}
 
-		actionstream << player->getName() << " damaged by "
+		verbosestream << player->getName() << " damaged by "
 				<< (int)damage << " hp at " << PP(playersao->getBasePosition() / BS)
 				<< std::endl;
 
@@ -1311,7 +1311,7 @@ void Server::handleCommand_Interact(NetworkPacket *pkt)
 			if (pointed_object->isGone())
 				return;
 
-			actionstream << player->getName() << " right-clicks object "
+			verbosestream << player->getName() << " right-clicks object "
 					<< pointed.object_id << ": "
 					<< pointed_object->getDescription() << std::endl;
 
@@ -1353,7 +1353,7 @@ void Server::handleCommand_Interact(NetworkPacket *pkt)
 		ItemStack selected_item;
 		playersao->getWieldedItem(&selected_item, nullptr);
 
-		actionstream << player->getName() << " uses " << selected_item.name
+		verbosestream << player->getName() << " uses " << selected_item.name
 				<< ", pointing at " << pointed.dump() << std::endl;
 
 		if (m_script->item_OnUse(
@@ -1373,7 +1373,7 @@ void Server::handleCommand_Interact(NetworkPacket *pkt)
 		ItemStack selected_item;
 		playersao->getWieldedItem(&selected_item, nullptr);
 
-		actionstream << player->getName() << " activates "
+		verbosestream << player->getName() << " activates "
 				<< selected_item.name << std::endl;
 
 		if (m_script->item_OnSecondaryUse(

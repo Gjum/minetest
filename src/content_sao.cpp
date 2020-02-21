@@ -669,7 +669,7 @@ u16 LuaEntitySAO::punch(v3f dir,
 		m_env->getScriptIface()->luaentity_on_death(m_id, puncher);
 	}
 
-	actionstream << puncher->getDescription() << " (id=" << puncher->getId() <<
+	verbosestream << puncher->getDescription() << " (id=" << puncher->getId() <<
 			", hp=" << puncher->getHP() << ") punched " <<
 			getDescription() << " (id=" << m_id << ", hp=" << m_hp <<
 			"), damage=" << (old_hp - (s32)getHP()) <<

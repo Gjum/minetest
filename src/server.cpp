@@ -1000,13 +1000,13 @@ PlayerSAO* Server::StageTwoClientInit(session_t peer_id)
 	{
 		const std::vector<std::string> &names = m_clients.getPlayerNames();
 
-		actionstream << player->getName() << " joins game. List of players: ";
+		verbosestream << player->getName() << " joins game. List of players: ";
 
 		for (const std::string &name : names) {
-			actionstream << name << " ";
+			verbosestream << name << " ";
 		}
 
-		actionstream << player->getName() <<std::endl;
+		verbosestream << player->getName() <<std::endl;
 	}
 	return playersao;
 }

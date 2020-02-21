@@ -312,7 +312,7 @@ function core.item_place_node(itemstack, placer, pointed_thing, param2,
 		return itemstack
 	end
 
-	log("action", playername .. " places node "
+	log("verbose", playername .. " places node "
 		.. def.name .. " at " .. core.pos_to_string(place_to))
 
 	local oldnode = core.get_node(place_to)
@@ -340,7 +340,7 @@ function core.item_place_node(itemstack, placer, pointed_thing, param2,
 				z = above.z - placer_pos.z
 			}
 			newnode.param2 = core.dir_to_facedir(dir)
-			log("action", "facedir: " .. newnode.param2)
+			log("verbose", "facedir: " .. newnode.param2)
 		end
 	end
 
@@ -577,7 +577,7 @@ function core.node_dig(pos, node, digger)
 	end
 
 	if is_protected(pos, diggername, core.DIG_ACTION) then
-		log("action", diggername
+		log("verbose", diggername
 				.. " tried to dig " .. node.name
 				.. " at protected position "
 				.. core.pos_to_string(pos))
@@ -585,7 +585,7 @@ function core.node_dig(pos, node, digger)
 		return
 	end
 
-	log('action', diggername .. " digs "
+	log('verbose', diggername .. " digs "
 		.. node.name .. " at " .. core.pos_to_string(pos))
 
 	local wielded = digger and digger:get_wielded_item()
