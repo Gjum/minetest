@@ -972,7 +972,7 @@ void ICraftAction::apply(InventoryManager *mgr,
 			output_replacements.push_back(itemstack);
 		}
 
-		actionstream << player->getDescription()
+		verbosestream << player->getDescription()
 				<< " crafts "
 				<< crafted.getItemString()
 				<< std::endl;
