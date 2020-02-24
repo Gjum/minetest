@@ -483,6 +483,8 @@ function core.do_item_eat(hp_change, replace_with_item, itemstack, user, pointed
 				-- Check if inv is null, since non-players don't have one
 				if inv and inv:room_for_item("main", {name=replace_with_item}) then
 					inv:add_item("main", replace_with_item)
+				elseif inv and inv:room_for_item("main2", {name=replace_with_item}) then
+					inv:add_item("main2", replace_with_item)
 				else
 					local pos = user:get_pos()
 					pos.y = math.floor(pos.y + 0.5)
@@ -519,7 +521,11 @@ function core.handle_node_drops(pos, drops, digger)
 	local give_item
 	if inv then
 		give_item = function(item)
-			return inv:add_item("main", item)
+			local left = inv:add_item("main", item)
+			if left and not left:is_empty() then
+				return inv:add_item("main2", item)
+			end
+			return left
 		end
 	else
 		give_item = function(item)

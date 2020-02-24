@@ -626,6 +626,9 @@ local function handle_give_command(cmd, giver, receiver, stackstring)
 		return false, receiver .. " is not a known player"
 	end
 	local leftover = receiverref:get_inventory():add_item("main", itemstack)
+	if leftover and not leftover:is_empty() then
+		leftover = receiverref:get_inventory():add_item("main2", itemstack)
+	end
 	local partiality
 	if leftover:is_empty() then
 		partiality = ""

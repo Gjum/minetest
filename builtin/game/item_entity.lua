@@ -309,8 +309,11 @@ core.register_entity(":__builtin:item", {
 		if inv and self.itemstring ~= "" then
 			local left = inv:add_item("main", self.itemstring)
 			if left and not left:is_empty() then
-				self:set_item(left)
-				return
+				local left2 = inv:add_item("main2", left)
+				if left2 and not left2:is_empty() then
+					self:set_item(left2)
+					return
+				end
 			end
 		end
 		self.itemstring = ""
