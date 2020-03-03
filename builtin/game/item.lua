@@ -638,9 +638,10 @@ function core.node_dig(pos, node, digger)
                  break
               end
            end
-           -- Group has to match and tool must have high-enough level, else no drops
-           if group_match then
-              local node_level = def.groups.level or 0
+           -- Group has to match and tool must have high-enough level, else the
+           -- node won't give any drops
+           local node_level = def.groups.level or 0
+           if group_match or node_level == 0 then
               if node_level > max_drop_level then
                  drops = {}
               end
