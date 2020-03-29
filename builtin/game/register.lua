@@ -359,6 +359,21 @@ core.register_node(":air", {
 	groups = {not_in_creative_inventory=1},
 })
 
+core.register_node(":solid_air", {
+	description = "Solid Air",
+	inventory_image = "air.png",
+	wield_image = "air.png",
+	drawtype = "airlike",
+	paramtype = "light",
+	sunlight_propagates = true,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	air_equivalent = true,
+	drop = "",
+	groups = {not_in_creative_inventory=1},
+})
+
 core.register_node(":ignore", {
 	description = "Ignore",
 	inventory_image = "ignore.png",
