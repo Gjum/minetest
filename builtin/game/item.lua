@@ -551,25 +551,18 @@ local old_get_dig_params = core.get_dig_params
 core.get_dig_params = function(groups, toolcap)
    local res = old_get_dig_params(groups, toolcap)
    res.wear = math.max(res.wear, 1)
-   -- reverse some portion of what getDigParams determines to be tool wear
-   local wear_as_float = math.min(res.wear, 65535) / 65535
-   local used_leveldiff = 0
-   local level = groups.level or 0
+
    local tool_uses = 0
    for _,cap in pairs(toolcap.groupcaps) do
-      local leveldiff = cap.maxlevel - level
       tool_uses = math.max(cap.uses, tool_uses)
-      if leveldiff < 0 then
-         goto continue
-      end
-      used_leveldiff = leveldiff
-      ::continue::
    end
+
    if tool_uses ~= 0 then
       res.wear = math.ceil(65535 / tool_uses)
    else
       res.wear = 0
    end
+
    return res
 end
 
